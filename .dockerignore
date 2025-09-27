@@ -1,0 +1,21 @@
+# Ignorar git
+.git
+.gitignore
+
+# Ignorar IDEs
+.vscode
+.idea
+
+# Ignorar Maven build
+target/
+
+# Ignorar arquivos de ambiente
+.env
+.env.*
+
+# Ignorar logs
+*.log
+
+# Ignorar sistema operacional
+.DS_Store
+Thumbs.db

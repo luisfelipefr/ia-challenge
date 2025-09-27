@@ -1,0 +1,10 @@
+# Maven
+target/
+# IDE
+.idea/
+.vscode/
+# SO
+.DS_Store
+# Docker
+**/.env
+.env
