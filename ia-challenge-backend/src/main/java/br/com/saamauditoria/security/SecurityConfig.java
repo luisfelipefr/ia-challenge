@@ -29,8 +29,6 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/ping").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/auth/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/users/register").permitAll()
-                        // Se quiser liberar o GET de produtos sem login, descomente:
-                        // .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(new JwtFilter(jwt, users), UsernamePasswordAuthenticationFilter.class);

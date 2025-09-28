@@ -10,15 +10,11 @@ public class Product {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     @NotBlank
     private String name;
-
     private String description;
-
     @PositiveOrZero
     private double price;
-
     @PositiveOrZero
     private int quantity;
 
