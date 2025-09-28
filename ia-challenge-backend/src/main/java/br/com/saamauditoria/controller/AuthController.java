@@ -11,7 +11,7 @@ record LoginRes(String token) {}
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:5173"})
+@CrossOrigin(origins = {"http://localhost:4173"})
 public class AuthController {
 
     private final UserRepository users;
