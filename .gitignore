@@ -5,6 +5,5 @@ target/
 .vscode/
 # SO
 .DS_Store
-# Docker
-**/.env
-.env
+
+

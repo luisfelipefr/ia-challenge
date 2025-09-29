@@ -9,10 +9,6 @@
 # Ignorar Maven build
 target/
 
-# Ignorar arquivos de ambiente
-.env
-.env.*
-
 # Ignorar logs
 *.log
 
