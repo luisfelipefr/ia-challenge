@@ -1,6 +1,7 @@
 package br.com.saamauditoria.security;
 
 import br.com.saamauditoria.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -14,12 +15,13 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 @Configuration
 public class SecurityConfig {
+    @Value("${app.jwtSecret}")
+    private String jwtSecret;
 
     @Bean PasswordEncoder passwordEncoder() { return new BCryptPasswordEncoder(); }
 
     @Bean JwtService jwtService() {
-        String secret = System.getenv("JWT_SECRET");
-        return new JwtService(secret);
+        return new JwtService(jwtSecret);
     }
 
     @Bean
