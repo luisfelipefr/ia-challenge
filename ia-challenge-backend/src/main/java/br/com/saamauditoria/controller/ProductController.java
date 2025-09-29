@@ -1,7 +1,6 @@
 package br.com.saamauditoria.controller;
 
 import br.com.saamauditoria.model.Product;
-import br.com.saamauditoria.repository.ProductRepository;
 import br.com.saamauditoria.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
