@@ -1,265 +1,228 @@
+# IA Challenge Backend
 
-# 📘 IA Challenge — Backend
+API REST do desafio tecnico. O backend disponibiliza cadastro e autenticacao de usuarios e gestao de produtos,
+usando Spring Boot 3, PostgreSQL e JWT. O repositorio inclui a configuracao Docker para levantar banco e aplicacao
+rapidamente.
 
-Este repositório contém o **backend** do desafio técnico.  
-A aplicação foi desenvolvida em **Spring Boot**, com **PostgreSQL** como banco de dados, **Docker** para containerização e autenticação via **JWT**.
+## Visao Geral
 
----
+- Cadastro e login de usuarios com senha criptografada via BCrypt.
+- Geracao de token JWT com validade de 8 horas e autorizacao por papel (ROLE_*).
+- CRUD simplificado de produtos (listar, criar, remover) restrito a usuarios autenticados.
+- CORS configuravel por variavel de ambiente para integracao com front-ends.
+- Dockerfile multi-stage e docker compose para ambiente padrao com PostgreSQL 16.
 
-## 🚀 Tecnologias utilizadas
-- **Java 21** + **Spring Boot 3**  
-- **Maven** (build e dependências)  
-- **PostgreSQL 16** (banco de dados)  
-- **Docker & Docker Compose** (containerização)  
-- **JWT** (autenticação e autorização)  
-- **Hibernate/JPA** (ORM)
+## Tecnologias
 
----
+- Java 21 / Spring Boot 3
+- Maven 3.9
+- PostgreSQL 16
+- Spring Security + JWT
+- Docker e Docker Compose
 
-## 📂 Estrutura do projeto
+## Estrutura do repositorio
+
 ```
 .
-├── Dockerfile
-├── docker-compose.yml
-├── pom.xml
-├── .dockerignore
-├── .gitignore
-├── .env.example
-└── src/
-    └── main/java/br/com/saamauditoria
-        ├── controller/   # Controllers (APIs REST)
-        ├── model/        # Entidades do banco
-        ├── repository/   # Repositórios (JPA)
-        └── security/     # Autenticação JWT
+|-- docker-compose.yml
+|-- .env
+|-- ia-challenge-backend/
+    |-- pom.xml
+    |-- Dockerfile
+    |-- src/main/java/br/com/saamauditoria/
+        |-- controller/    # Endpoints REST
+        |-- dto/           # Modelos para login
+        |-- model/         # Entidades JPA
+        |-- repository/    # Acesso a dados
+        |-- security/      # Configuracao de JWT, filtros e CORS
+    |-- src/main/resources/application.properties
 ```
 
----
+## Pre-requisitos
 
-## ⚙️ Pré-requisitos
+- Docker e Docker Compose
+- Git
+- Opcional: Java 21 e Maven 3.9+ (para rodar sem Docker)
+- Opcional: PostgreSQL 16 local (caso nao use os containers)
 
-Antes de rodar o projeto, você precisa ter instalado:
-- [Docker](https://www.docker.com/)
-- [Docker Compose](https://docs.docker.com/compose/)
-- [Git](https://git-scm.com/)
+## Variaveis de ambiente
 
-> **Opcional**: Java 21 e Maven, caso queira rodar sem Docker.
+O arquivo `.env` na raiz eh lido automaticamente pelo Docker Compose. Ajuste conforme necessario.
 
----
+| Variavel          | Descricao                                           | Padrao      |
+|-------------------|-----------------------------------------------------|-------------|
+| POSTGRES_DB       | Nome do banco PostgreSQL                            | appdb       |
+| POSTGRES_USER     | Usuario do banco                                    | app         |
+| POSTGRES_PASSWORD | Senha do banco                                      | app         |
+| DB_HOST           | Host acessado pelo backend                          | db          |
+| DB_PORT           | Porta do PostgreSQL                                 | 5432        |
+| BACKEND_PORT      | Porta HTTP exposta pela API                         | 8080        |
+| JWT_SECRET        | Segredo usado para assinar o JWT (>= 32 caracteres) | obrigatorio |
+| FRONTEND_PORT     | Porta esperada pelo front para CORS (opcional)      | 4173        |
 
-## 🔑 Configuração do ambiente
+A lista completa de variaveis usadas pelo Spring esta em `src/main/resources/application.properties`. Caso precise
+liberar outro dominio para CORS, ajuste `CORS_ALLOWED_ORIGINS` (ou defina `app.cors.allowed-origins` como variavel de
+ambiente).
 
-1. **Clone este repositório**
-   ```bash
-   git clone https://github.com/luisfelipefr/ia-challenge.git
+## Configuracao rapida
+
+1. Clone o repositorio.
+   ```
+   git clone <url>
    cd ia-challenge
    ```
-
-2. **Crie o arquivo `.env` a partir do exemplo**
-   ```bash
-   cp .env.example .env
+2. Revise o arquivo `.env` e substitua senhas ou segredos conforme politicas internas. Gere um novo valor seguro para
+   `JWT_SECRET`:
    ```
+   # PowerShell
+   $bytes = New-Object Byte[] 32
+   (New-Object System.Security.Cryptography.RNGCryptoServiceProvider).GetBytes($bytes)
+   ($bytes | ForEach-Object { $_.ToString("x2") }) -join ""
+   ```
+3. (Opcional) Atualize `CORS_ALLOWED_ORIGINS` com as URLs do seu front-end.
 
-3. **Edite o `.env` e configure os valores**
-   - Gere uma chave segura para o `JWT_SECRET`:
-     ```powershell
-     # PowerShell
-     $bytes = New-Object Byte[] 32
-     (New-Object System.Security.Cryptography.RNGCryptoServiceProvider).GetBytes($bytes)
-     ($bytes | ForEach-Object { $_.ToString("x2") }) -join ""
-     ```
-   - Ou no Linux/macOS/WSL:
-     ```bash
-     openssl rand -hex 32
-     ```
+## Executar com Docker Compose
 
-   - Exemplo final do `.env`:
-     ```
-     # postgres
-     POSTGRES_DB=ia_challenge
-     POSTGRES_USER=postgres
-     POSTGRES_PASSWORD=postgres
-     DB_HOST=db
-     DB_PORT=5432
-     
-     # backend
-     BACKEND_PORT=8080
-     JWT_SECRET=c0a1e3948d01c8df74e49e9d28b79cda20959a3e2ff47f8cc7c8e9236baf3c72
-     ```
-
----
-
-## 🐳 Rodando com Docker Compose
-
-Suba a aplicação com um único comando:
-
-```bash
+```
 docker compose up --build
 ```
 
-- O backend estará disponível em: **http://localhost:8080**
-- O PostgreSQL em: **localhost:5432**
+- API: http://localhost:8080
+- PostgreSQL: localhost:5432
 
-> O Docker vai criar automaticamente um volume para persistência dos dados do banco.
+Para rodar em background: `docker compose up --build -d`. Para interromper e remover volumes: `docker compose down -v`.
 
----
+## Referencia da API
 
-## 🧪 Testando a API
+| Metodo | Caminho             | Descricao                    | Autenticacao |
+|--------|---------------------|------------------------------|--------------|
+| GET    | /ping               | Verifica disponibilidade     | Nao          |
+| POST   | /api/users/register | Cria um novo usuario         | Nao          |
+| POST   | /api/auth/login     | Retorna um JWT valido por 8h | Nao          |
+| GET    | /api/products       | Lista produtos cadastrados   | Bearer token |
+| POST   | /api/products       | Cria produto                 | Bearer token |
+| DELETE | /api/products/{id}  | Remove produto pelo id       | Bearer token |
 
-### 1. Health check
-```bash
-curl http://localhost:8080/ping
-```
-**Resposta esperada:**
-```
-pong
-```
+### Registrar usuario
 
----
-
-### 2. Registrar usuário
-**Endpoint:**
 ```
 POST /api/users/register
-```
+Content-Type: application/json
 
-**Body:**
-```json
 {
   "username": "admin",
   "email": "admin@local",
-  "password": "admin"
+  "password": "suaSenhaSegura",
+  "roles": "ROLE_ADMIN"   // opcional, padrao ROLE_USER
 }
 ```
 
-**Resposta esperada:**
-```
-User created successfully
-```
+endpoint não adicionado ao projeto
 
----
+Respostas:
 
-### 3. Login (gera JWT)
-**Endpoint:**
+- 200 OK: "User created successfully"
+- 400 Bad Request: email ja cadastrado ou validacao falhou.
+
+### Login
+
 ```
 POST /api/auth/login
-```
+Content-Type: application/json
 
-**Body:**
-```json
 {
   "email": "admin@local",
-  "password": "admin"
+  "password": "suaSenhaSegura"
 }
 ```
 
-**Resposta esperada:**
-```json
+Resposta (200 OK):
+
+```
 {
-  "token": "eyJhbGciOiJIUzI1..."
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
 ```
 
----
+Use o token no cabecalho `Authorization: Bearer <token>`.
 
-### 4. Criar produto
-**Endpoint:**
-```
-POST /api/products
-```
+### Listar produtos
 
-**Headers:**
-```
-Authorization: Bearer SEU_TOKEN
-Content-Type: application/json
-```
-
-**Body:**
-```json
-{
-  "name": "Mouse",
-  "description": "Mouse Gamer RGB",
-  "price": 150.0,
-  "quantity": 10
-}
-```
-
-**Resposta esperada:**
-```json
-{
-  "id": 1,
-  "name": "Mouse",
-  "description": "Mouse Gamer RGB",
-  "price": 150.0,
-  "quantity": 10
-}
-```
-
----
-
-### 5. Listar produtos
-**Endpoint:**
 ```
 GET /api/products
+Authorization: Bearer <token>
 ```
 
-**Headers:**
-```
-Authorization: Bearer SEU_TOKEN
-```
+Resposta:
 
-**Resposta esperada:**
-```json
+```
 [
   {
     "id": 1,
     "name": "Mouse",
-    "description": "Mouse Gamer RGB",
+    "description": "Mouse gamer RGB",
     "price": 150.0,
     "quantity": 10
   }
 ]
 ```
 
----
+### Criar produto
 
-## 🧰 Endpoints principais
+```
+POST /api/products
+Authorization: Bearer <token>
+Content-Type: application/json
 
-| Método | Endpoint           | Descrição                     | Autenticação |
-|--------|--------------------|--------------------------------|--------------|
-| GET    | `/ping`            | Health check                   | ❌ Não |
-| POST   | `/api/auth/login`  | Login e geração de JWT (email + senha) | ❌ Não |
-| POST   | `/api/users/register` | Cria usuário (username, email, senha) | ❌ Não |
-| GET    | `/api/products`    | Lista produtos                 | ✅ Sim |
-| POST   | `/api/products`    | Cria um novo produto            | ✅ Sim |
-
----
-
-## 🧹 Limpeza de containers e volumes
-
-Se precisar parar e limpar tudo:
-
-```bash
-docker compose down -v
+{
+  "name": "Mouse",
+  "description": "Mouse gamer RGB",
+  "price": 150.0,
+  "quantity": 10
+}
 ```
 
-> `-v` remove volumes (inclusive dados do banco).
+Regras de validacao:
 
----
+- `name` nao pode ser vazio.
+- `description` deve ser enviado (o servico faz `trim`).
+- `price` e `quantity` devem ser >= 0.
 
-## 🤖 Uso de IA neste projeto
-Durante o desenvolvimento, a **IA foi utilizada** para:
+Resposta:
 
-- Sugerir estrutura inicial do projeto.
-- Auxiliar na escrita de Dockerfile e docker-compose.
-- Otimizar configurações do Spring Boot.
-- Gerar exemplos de testes com Postman e curl.
-- Melhorar a legibilidade de commits e documentação.
+```
+{
+  "id": 1,
+  "name": "Mouse",
+  "description": "Mouse gamer RGB",
+  "price": 150.0,
+  "quantity": 10
+}
+```
 
-**Benefício:** agilizou o desenvolvimento, manteve boas práticas e garantiu clareza na entrega final.
+### Remover produto
 
----
+```
+DELETE /api/products/1
+Authorization: Bearer <token>
+```
 
-## 📜 Licença
-Este projeto é apenas para **avaliação técnica** e não possui licença para uso comercial.
+Resposta: 200 OK sem corpo. Se o id nao existir, o delete nao gera erro mas nenhum item e removido.
 
----
+## 🤖 Uso de IA no projeto
+
+Durante todo o desenvolvimento, utilizei o Codex como ferramenta de apoio estratégico, atuando em diferentes etapas do
+projeto para acelerar o desenvolvimento e garantir qualidade no resultado final.
+<br>
+O Codex foi essencial para:
+
+- **Definição da arquitetura inicial**: sugeriu a estrutura base do projeto em Spring Boot.
+- **Configuração e infraestrutura**: ajudou na criação do Dockerfile e docker-compose, garantindo a correta configuração
+  do PostgreSQL e variáveis de ambiente seguras
+- **Resolução de erros e problemas de configuração**: todos os erros mais comuns durante a integração entre Spring Boot,
+  PostgreSQL e Docker foram solucionados com o auxílio do Codex, o que reduziu significativamente o tempo de depuração.
+- **Documentação e padronização**: auxiliou na escrita do README e também na padronização de commits
+
+O uso do Codex acelerou o desenvolvimento, eliminou gargalos de configuração, garantiu uma estrutura sólida e bem
+organizada.
+Lembrando que todas as sugestões foram revisadas, testadas e adaptadas para o projeto.
