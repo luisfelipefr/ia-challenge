@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = {"http://localhost:4173"})
 public class AuthController {
 
     private final UserRepository users;
@@ -30,6 +29,6 @@ public class AuthController {
             return ResponseEntity.status(401).body("Invalid credentials");
         }
         String token = jwt.generate(user.getUsername(), 1000L * 60 * 60 * 8); // 8h
-        return ResponseEntity.ok(new LoginRes(token));
+        return ResponseEntity.ok(new LoginResponseDTO(token));
     }
 }

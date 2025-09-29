@@ -11,11 +11,13 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/products")
-@CrossOrigin(origins = {"http://localhost:4173"})
 public class ProductController {
 
     private final ProductService productService;
-    public ProductController(ProductService productService) { this.productService = productService; }
+
+    public ProductController(ProductService productService) {
+        this.productService = productService;
+    }
 
     @GetMapping
     public List<Product> list() {
@@ -28,7 +30,7 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete (@PathVariable Long id) {
+    public void delete(@PathVariable Long id) {
         productService.delete(id);
     }
 }
