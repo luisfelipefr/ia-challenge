@@ -3,6 +3,7 @@ package br.com.saamauditoria.controller;
 import br.com.saamauditoria.model.User;
 import br.com.saamauditoria.repository.UserRepository;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = {"http://localhost:4173"})
 public class UserController {
     private final UserRepository users;
     private final PasswordEncoder enc;
@@ -22,6 +22,7 @@ public class UserController {
         this.users = users;
         this.enc = enc;
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody User user) {
@@ -33,6 +34,7 @@ public class UserController {
         if (user.getRoles() == null || user.getRoles().isBlank()) {
             user.setRoles("ROLE_USER");
         }
+
         users.save(user);
         return ResponseEntity.ok("User created successfully");
     }

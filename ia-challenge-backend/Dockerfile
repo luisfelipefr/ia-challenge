@@ -6,6 +6,7 @@ COPY src ./src
 # build + repackage (o parent já ativa o repackage no 'package')
 RUN --mount=type=cache,target=/root/.m2 mvn -DskipTests -e -B clean package
 
+#-------------------------------------
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar

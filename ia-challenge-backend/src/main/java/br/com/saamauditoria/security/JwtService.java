@@ -8,6 +8,7 @@ import java.security.Key;
 import java.util.Date;
 
 public class JwtService {
+
     private final Key key;
 
     public JwtService(String secret) {
