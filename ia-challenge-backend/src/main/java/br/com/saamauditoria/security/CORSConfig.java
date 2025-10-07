@@ -20,7 +20,6 @@ public class CORSConfig {
 
     @Bean
     public WebMvcConfigurer corsConfigurer() {
-        System.out.println("CARMELLO CARALHO");
         final String[] patterns = Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isBlank())
